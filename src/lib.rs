@@ -793,9 +793,14 @@ fn spine_update_animation(
     time: Res<Time>,
     spine_event_queue: Res<SpineEventQueue>,
 ) {
-    for (_, mut spine) in spine_query.iter_mut() {
-        spine.update(time.delta_seconds());
-    }
+    spine_query
+        .par_iter_mut()
+        .for_each_mut(|(_, mut spine)| {
+            spine.update(time.delta_seconds());
+        });
+    // for (_, mut spine) in spine_query.iter_mut() {
+    //     spine.update(time.delta_seconds());
+    // }
     {
         let mut events = spine_event_queue.0.lock().unwrap();
         while let Some(event) = events.pop_front() {
